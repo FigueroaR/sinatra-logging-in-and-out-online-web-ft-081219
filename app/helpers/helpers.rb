@@ -1,4 +1,4 @@
-require 'pry'
+
 class Helpers < ApplicationController
 
     def self.is_logged_in?(session)
