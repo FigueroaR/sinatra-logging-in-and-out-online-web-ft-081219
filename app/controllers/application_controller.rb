@@ -1,7 +1,9 @@
 require_relative '../../config/environment'
 require 'pry'
 class ApplicationController < Sinatra::Base
+  register Sinatra::ActiveRecordExtension
   configure do
+    set :public_folder, "public"
     set :views, Proc.new { File.join(root, "../views/") }
     enable :sessions unless test?
     set :session_secret, "secret"
@@ -13,10 +15,7 @@ class ApplicationController < Sinatra::Base
 
   post '/login' do
     #binding.pry
-    #puts params
-    @username = params["username"]
-    @password = params["password"]
-    @user = User.find_by(username: params[:username])
+    @user = User.find_by(:username => params[:username])
     if @user != nil && @user.password == params[:password] 
       # set our sesssion hash and redirect accordingly
       session[:user_id] = @user.id
@@ -24,17 +23,13 @@ class ApplicationController < Sinatra::Base
     else
       erb :error
     end
-    
   end
 
   get '/account' do
     #binding.pry
-    #@user = User.find_by(id: params[:id])
-    #if @user != @user.current_user(sessio)
-      #erb :error
-    #end
+    @user = User.find_by_id(session[:user_id])   
 
-    if @user.is_logged_in?(session)
+    if @user
       erb :account
     else 
       erb :error
